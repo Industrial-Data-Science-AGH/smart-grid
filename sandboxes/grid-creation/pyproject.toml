@@ -1,0 +1,9 @@
+[project]
+name = "grid-creation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "grid2op>=1.12.2",
+]
