@@ -24,12 +24,25 @@ The environment is provided by [Grid2Op](https://github.com/Grid2op/grid2op), wh
 ## **Quickstart**
 > [TODO](https://github.com/Industrial-Data-Science-AGH/smart-grid-agent/issues/2): Describe quickstart
 
-## **Project Structure**
-- **`sandboxes/`**: Transient notebooks, prototyping scripts, and exploratory analysis.
-- **`core/`**: Stable, production-ready implementation of the project's main components.
-> [TODO](https://github.com/Industrial-Data-Science-AGH/smart-grid-agent/issues/2): add and describe final project structure
+## Project Structure
 
-Core functionality lives in the top-level folders. Keep experiments and quick prototypes inside `sandboxes/` to avoid polluting the main implementation.
+- **`core/`** – main Python package with the project’s implementation  
+  - **`core/envs/`** – environment wrappers around Grid2Op, configuration and registration of environments  
+  - **`core/agents/`** – agent interfaces and implementations (baseline agents, RL agents, heuristics)  
+  - **`core/training/`** – training loops, callbacks (logging, checkpointing), and integration with configs  
+  - **`core/evaluation/`** – evaluation pipelines, metrics, and reporting utilities  
+  - **`core/utils/`** – shared helpers (logging, seeding, config loading, path utilities, etc.)  
+  - **`core/scripts/`** – Python entrypoints for running training/evaluation (e.g. `train_agent.py`, `evaluate_agent.py`)  
+  - **`core/tests/`** – tests for the modules inside `core/` (unit and integration tests)
+
+- **`sandboxes/`** – transient notebooks, prototyping scripts, and exploratory analysis.  
+  Use this for experiments that are **not** yet production-ready; once stabilized, code should be promoted into `core/`.
+
+- **Root files**  
+  - **`README.md`** – main documentation and quickstart  
+  - **`pyproject.toml`** – Python dependencies and project metadata (managed via `uv`)  
+  - **`Dockerfile` / `docker-compose.yml`** (planned) – containerized development and execution environment
+
 
 ## **Contributing Guidelines**
 
