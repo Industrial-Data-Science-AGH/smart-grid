@@ -1,0 +1,5 @@
+# Enforce LF on all text files
+* text=auto eol=lf
+
+# Exceptions: specific files that MUST be Windows-style (rare)
+*.{cmd,bat} text eol=crlf

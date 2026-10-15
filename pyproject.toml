@@ -1,0 +1,81 @@
+# CRITICAL: environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+#
+# ml-stack: notebook environment for RL (Grid2Op) and deep-learning experiments.
+#
+# Pick exactly ONE torch extra, optionally add `kaggle`:
+#   uv sync                                   # no torch: Jupyter, plotting, scikit-learn only
+#   uv sync --extra cpu                       # CPU torch
+#   uv sync --extra cpu-rl                    # CPU torch + Grid2Op, lightsim2grid, gymnasium, SB3
+#   uv sync --extra cuda                      # CUDA torch (see disclaimer)
+#   uv sync --extra cuda-rl                   # CUDA torch + RL stack (see disclaimer)
+#   uv sync --extra cpu-rl --extra kaggle     # any torch extra can be combined with kaggle
+#
+# DISCLAIMER: the CUDA extras are subject to change and are for informational
+# purposes only for now. The CUDA version is a placeholder until a compute
+# provider is chosen, and nobody has tested these extras on a GPU yet.
+# The version lives in one place: the `pytorch-cuda` index URL at the bottom.
+#
+# Notes:
+#   - Don't use --all-extras: the torch extras are mutually exclusive.
+#   - There is deliberately no plain `rl` extra. Stable-Baselines3 depends on
+#     torch, and without a torch extra uv would fetch PyPI's default CUDA build.\
+#   - uv pip list | grep -iE torch
+#   - commit uv.lock, .python-version, pyproject.toml 
+
+[project]
+name = "ml-stack"
+version = "0.1.0"
+description = "Notebook environment for RL and deep-learning experiments"
+requires-python = ">=3.11, <3.13"
+dependencies = [
+    "ipykernel",
+    "jupyter",
+    "matplotlib",
+    "numpy",
+    "scikit-learn",
+    "seaborn",
+]
+
+[project.optional-dependencies]
+# Torch extras. uv can only route a package to an index based on an extra that
+# also lists that package, so the RL stack is repeated in each -rl variant.
+cpu = ["torch"]
+cuda = ["torch"]
+cpu-rl = ["torch", "grid2op", "lightsim2grid", "gymnasium", "stable-baselines3"]
+cuda-rl = ["torch", "grid2op", "lightsim2grid", "gymnasium", "stable-baselines3"]
+
+# Feature extra: combines freely with any one torch extra.
+kaggle = ["kaggle"]
+
+[tool.uv]
+# An environment, not a distributable package.
+package = false
+# The platform this lockfile is valid for (local WSL2 and the dev container).
+# Widen this if teammates or cloud hosts use a different platform.
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+# The torch extras pull from different indexes, so they can't coexist.
+conflicts = [[
+    { extra = "cpu" },
+    { extra = "cuda" },
+    { extra = "cpu-rl" },
+    { extra = "cuda-rl" },
+]]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cpu", extra = "cpu-rl" },
+    { index = "pytorch-cuda", extra = "cuda" },
+    { index = "pytorch-cuda", extra = "cuda-rl" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+# Placeholder CUDA version (12.6): subject to change, see disclaimer above.
+[[tool.uv.index]]
+name = "pytorch-cuda"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
