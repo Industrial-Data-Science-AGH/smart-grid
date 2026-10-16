@@ -23,7 +23,7 @@
 #   - commit uv.lock, .python-version, pyproject.toml 
 
 [project]
-name = "ml-stack"
+name = "smart-grid"
 version = "0.1.0"
 description = "Notebook environment for RL and deep-learning experiments"
 requires-python = ">=3.11, <3.13"
@@ -47,9 +47,15 @@ cuda-rl = ["torch", "grid2op", "lightsim2grid", "gymnasium", "stable-baselines3"
 # Feature extra: combines freely with any one torch extra.
 kaggle = ["kaggle"]
 
-[tool.uv]
+# previously:
 # An environment, not a distributable package.
-package = false
+# [tool.uv]
+# package = false
+
+# default module-name is  src/<project name, normalized>/
+[tool.uv.build-backend]
+module-name = "core"     # module-root defaults to "src"
+
 # The platform this lockfile is valid for (local WSL2 and the dev container).
 # Widen this if teammates or cloud hosts use a different platform.
 environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
