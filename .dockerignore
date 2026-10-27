@@ -3,6 +3,7 @@
 
 .obsidian
 .vscode
+*.code-workspace
 
 __pycache__/
 *.py[cod]

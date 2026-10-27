@@ -3,6 +3,7 @@
 # should NOT be put here
 
 .obsidian
+*.code-workspace
 
 # Python
 __pycache__/
@@ -14,6 +15,8 @@ __pycache__/
 # Virtual env
 .venv/
 .env/
+
+.env
 
 # Ray
 ray_results/

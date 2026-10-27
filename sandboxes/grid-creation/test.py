@@ -2,5 +2,5 @@
 import grid2op
 from lightsim2grid import LightSimBackend
 env_name = "l2rpn_case14_sandbox"  # or any other name.
-env = grid2op.make(env_name, backend=LightSimBackend())
-print(env.backend.__class__.__name__)
+# env = grid2op.make(env_name, backend=LightSimBackend())
+# print(env.backend.__class__.__name__)
