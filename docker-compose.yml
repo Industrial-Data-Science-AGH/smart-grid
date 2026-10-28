@@ -1,8 +1,51 @@
+# Dockerfile stages:
+# base         user (UID 1000), ENV, WORKDIR
+# ├── dev           no sync; the volume + lifecycle sync own .venv
+# └── dependencies  uv sync --no-install-project --no-dev
+#      └── runtime  COPY source, uv sync --no-dev   → baked at /app/.venv
+
+# Fixed project name, so VS Code and the plain CLI use the same volumes.
+name: smart-grid
+
 services:
-  app:
+  # devcontainer - venv owned by named volume, and ownership is to "nonroot" user (can write to .venv) (installed by lifecycle uv sync - check devcontainer.json), same project structure as local
+  # small image - venv and uv-cache are in volumes instead
+  dev: 
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev
+    environment:
+      SYNC_EXTRAS: ${SYNC_EXTRAS:---extra cpu-rl}   # :- then the default, which itself starts with -- (${var} is, instead of going with the default, sourced by .env file if it exist)
+    platform: linux/amd64          # the one supported platform (matches uv.lock's environments)
+    command: sleep infinity        # keeps the container alive for the dev container tool
     ports:
-      - "8501:8501"
+      - "127.0.0.1:8501:8501"      # host-local only; the server inside must listen on 0.0.0.0
     volumes:
+      - .:/app/workspace                     # bind: your repo
+      - venv:/app/workspace/.venv            # named volume: owned by the lifecycle sync
+      - uv-cache:/home/nonroot/.cache/uv     # named volume: keeps re-syncs fast
+
+  # for outside compute (untested) - venv baked into the image, lives at /app/.venv (root owned); uid config sidestepped by not having to write across the filesystem boundary (otherwise probably set in compose) 
+  # no entrypoint - supply own
+  # very big image, with everything besides dev packages
+  runtime:
+    profiles: ["runtime"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+      args: 
+        EXTRAS: ${SYNC_EXTRAS:---extra cpu-rl}
+    platform: linux/amd64
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  venv:
+  uv-cache:

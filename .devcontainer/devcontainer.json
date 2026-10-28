@@ -1,0 +1,21 @@
+{
+  "dockerComposeFile": "../docker-compose.yml", // relative to this file, i.e. .devcontainer/devcontainer.json
+  "service": "dev",                              // must match the service name in docker-compose.yml
+  "workspaceFolder": "/app/workspace",           // must match the bind-mount target; lifecycle commands and terminals run from here
+  "remoteUser": "nonroot",                       // runs the lifecycle scripts and editor processes: https://containers.dev/implementors/json_reference/#lifecycle-scripts
+  "updateRemoteUserUID": true,                   // Linux/WSL: remaps nonroot's UID to yours (a no-op when host's is 1000, as built). This is limited in scope - chmod unaffected directories
+  // Installs the project (i.e. both dependencies and the proj itself) (editable) and the dev group into the venv volume; add extras here if you use them.
+  // Runs on creation and blocks until done (waitFor defaults to updateContentCommand); postCreateCommand would run in the background.
+  "updateContentCommand": "uv sync --locked $SYNC_EXTRAS",
+  "postStartCommand": "uv sync --locked $SYNC_EXTRAS",
+  "forwardPorts": [8888],                        // optional: Jupyter in a browser
+  "customizations": {
+    "vscode": { 
+      "extensions": ["ms-python.python", "ms-toolsai.jupyter", "tamasfe.even-better-toml"],
+      "settings": {
+      "python.defaultInterpreterPath": "/app/workspace/.venv/bin/python",
+      "terminal.integrated.defaultProfile.linux": "bash"
+    } 
+    }
+  } // https://containers.dev/implementors/spec/
+}

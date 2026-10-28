@@ -52,10 +52,11 @@ kaggle = ["kaggle"]
 # [tool.uv]
 # package = false
 
-# default module-name is  src/<project name, normalized>/
-[tool.uv.build-backend]
-module-name = "core"     # module-root defaults to "src"
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14"]    # match your uv
+build-backend = "uv_build"
 
+[tool.uv]
 # The platform this lockfile is valid for (local WSL2 and the dev container).
 # Widen this if teammates or cloud hosts use a different platform.
 environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
@@ -66,6 +67,10 @@ conflicts = [[
     { extra = "cpu-rl" },
     { extra = "cuda-rl" },
 ]]
+
+# default module-name is  src/<project name, normalized>/
+[tool.uv.build-backend]
+module-name = "core"     # module-root defaults to "src"
 
 [tool.uv.sources]
 torch = [
