@@ -61,7 +61,6 @@ best practices/gotchas:
     }
     ```
 
-- dotfiles, shorten to fit, not explain all [CLAUDE]
 - inspection/deletion: `docker`:
   - `container prune` → remove all stopped containers
   - `image prune -a` → remove all images without at least one container associated to them
