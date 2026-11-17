@@ -57,8 +57,7 @@ requires = ["uv_build>=0.13.1,<0.14"]    # match your uv
 build-backend = "uv_build"
 
 [tool.uv]
-# The platform this lockfile is valid for (local WSL2 and the dev container).
-# Widen this if teammates or cloud hosts use a different platform.
+# this restricts uv.lock to be platform-dependent
 environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
 # The torch extras pull from different indexes, so they can't coexist.
 conflicts = [[
