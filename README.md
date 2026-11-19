@@ -34,16 +34,6 @@ how to develop using devcontainers (in vscode):
 
 known issues:
 
-- **known issue:** set `BUILDX_BAKE_ENTITLEMENTS_FS=0` in the environment VS Code starts from (e.g. `echo 'export BUILDX_BAKE_ENTITLEMENTS_FS=0' >> ~/.profile`, then log out and in), and check it with `echo $BUILDX_BAKE_ENTITLEMENTS_FS` in a VS Code terminal. Temporary; remove once docker/compose#14285 is fixed.
-
-    ```bash
-    echo 'export BUILDX_BAKE_ENTITLEMENTS_FS=0' >> ~/.profile
-    ```
-
-    and relog.
-
-    <https://github.com/docker/compose/issues/14285>
-
 best practices/gotchas:
 
 - closing the remote connection doesn’t prune the container, only stops it. “Dev Containers: reopen in container” only runs the post-creation part of the setup tooling (building, values from `.env`, `updateContentCommand`, dotfiles). “Dev Containers: rebuild and reopen in container” guarantees predictability
