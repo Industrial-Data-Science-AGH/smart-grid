@@ -1,0 +1,104 @@
+# Builds the dev container the way a teammate's "Reopen in Container" does,
+# minus the editor, then runs scripts/check-devcontainer.sh inside it.
+#
+# Jobs:   changes ─┐
+#         lockfile ┴─> check ─> ci-ok   (ci-ok is the one to mark as required)
+name: devcontainer
+
+on:
+  pull_request: # PRs into any branch; add `branches: [main]` to limit it
+  push:
+    branches: [main]
+  workflow_dispatch: # "Run workflow" button (appears once this file is on main)
+
+permissions:
+  contents: read # the job tokens can read the repo, nothing else
+
+concurrency:
+  group: devcontainer-${{ github.ref }}
+  # cancel superseded PR runs, but let every run on main finish
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    name: detect changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # paths-filter asks the API which files a PR touches
+    outputs:
+      devcontainer: ${{ steps.filter.outputs.devcontainer }}
+    steps:
+      - uses: actions/checkout@v7 # needed for push events; PRs use the API
+      - id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            devcontainer:
+              - ".devcontainer/**"
+              - "Dockerfile"
+              - "docker-compose.yml"
+              - "pyproject.toml"
+              - "uv.lock"
+              - ".python-version"
+              - "scripts/check-devcontainer.sh"
+              - ".github/workflows/devcontainer.yml"
+
+  lockfile:
+    name: lockfile up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: "0.13.1" # same uv as inside the container
+      - run: uv lock --check
+
+  check:
+    name: build and check
+    needs: [changes, lockfile] # also implies: skip if lockfile failed
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.devcontainer == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DEVCONTAINER_CLI_VERSION: "0.87.0"
+      BUILDX_BAKE_ENTITLEMENTS_FS: "0"   # uncomment if the build fails asking for --allow=fs.read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node (the devcontainer CLI is an npm package)
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install the devcontainer CLI
+        run: npm install -g "@devcontainers/cli@${DEVCONTAINER_CLI_VERSION}"
+
+      - name: Show the runner's versions
+        run: |
+          id
+          uname -m
+          df -h /
+          docker version
+          docker compose version
+          docker buildx version
+          devcontainer --version
+
+      - name: Build and start the dev container
+        run: devcontainer up --workspace-folder .
+
+      - name: Run the environment check inside the container
+        run: echo "exec check" && devcontainer exec --workspace-folder . bash scripts/check-devcontainer.sh
+
+  ci-ok:
+    name: ci ok
+    needs: [changes, lockfile, check]
+    if: ${{ !cancelled() }} # run even when a needed job failed, so failures can't hide
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if any job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo "every job passed, or was skipped because nothing relevant changed"
