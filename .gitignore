@@ -21,6 +21,11 @@ __pycache__/
 
 .env
 
+# RL2Grid: unzipped action spaces (up to 1.3 GB) and run outputs
+third_party/RL2Grid/env/action_spaces/
+checkpoint/
+wandb/
+
 # Ray
 ray_results/
 
