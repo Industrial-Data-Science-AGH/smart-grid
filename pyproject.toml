@@ -26,7 +26,7 @@
 name = "smart-grid"
 version = "0.1.0"
 description = "Notebook environment for RL and deep-learning experiments"
-requires-python = ">=3.11, <3.13"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "ipykernel",
     "jupyter",
@@ -41,8 +41,8 @@ dependencies = [
 # also lists that package, so the RL stack is repeated in each -rl variant.
 cpu = ["torch"]
 cuda = ["torch"]
-cpu-rl = ["torch", "grid2op", "lightsim2grid", "gymnasium", "stable-baselines3"]
-cuda-rl = ["torch", "grid2op", "lightsim2grid", "gymnasium", "stable-baselines3"]
+cpu-rl = ["torch", "grid2op", "lightsim2grid", "gymnasium", "stable-baselines3", "wandb", "tensorboard", "mlflow"]
+cuda-rl = ["torch", "grid2op", "lightsim2grid", "gymnasium", "stable-baselines3", "wandb", "tensorboard", "mlflow"]
 
 # Feature extra: combines freely with any one torch extra.
 kaggle = ["kaggle"]
@@ -67,6 +67,18 @@ conflicts = [[
     { extra = "cuda-rl" },
 ]]
 
+# Versions RL2Grid was tested with (third_party/RL2Grid/setup.py and conda_env.yml),
+# plus what those old versions need to run. Applies to every extra.
+constraint-dependencies = [
+    "grid2op==1.11.0",      # RL2Grid's pin
+    "lightsim2grid==0.9.*", # RL2Grid's pin
+    "gymnasium==0.29.1",    # RL2Grid's pin; gymnasium 1.x changed vector envs and wrappers
+    "torch>=2.2,<2.10",     # RL2Grid's tested range; below are emergent, conservative pins, not from rl2grid
+    "numpy<2",              # Grid2Op 1.11 pulls pandapower 2.14, which uses numpy.Inf (gone in numpy 2)
+    "pandas<3",             # pandas 3 breaks Grid2Op 1.11's power-flow setup (this is  related to pandapower 2.14. Possible check in the future is whether pandapower 3.x would work on grid2op 1.11.0)
+    "setuptools<81",        # Grid2Op 1.11 imports pkg_resources
+]
+
 # default module-name is  src/<project name, normalized>/
 [tool.uv.build-backend]
 module-name = "core"     # module-root defaults to "src"
@@ -89,3 +101,8 @@ explicit = true
 name = "pytorch-cuda"
 url = "https://download.pytorch.org/whl/cu126"
 explicit = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]

@@ -1,7 +1,8 @@
 # originally taken from, now changed: https://github.com/astral-sh/uv-docker-example/blob/main/Dockerfile
 # Python image with uv pre-installed: ghcr.io/astral-sh/uv:0.13.1-python3.11-trixie-slim
 # Pinned by its index digest (covers all platforms); the platform itself is chosen in docker-compose.yml.
-FROM ghcr.io/astral-sh/uv:0.13.1-python3.11-trixie-slim@sha256:0f2d0e6d745eb7f9cc9bc3a8f3bec70f398b39f38c8a1c7fa2967ddbe91af8bd AS base
+# docker buildx imagetools inspect ghcr.io/astral-sh/uv:0.13.1-python3.12-trixie-slim (to get the Digest)
+FROM ghcr.io/astral-sh/uv:0.13.1-python3.12-trixie-slim@sha256:e28141cccc682844c7bed0cb7e5b2b4522c1f72f1d5116c7d22710d0d421f7dc AS base
 
 # Non-root user. UID 1000 matches the usual first user on Linux/WSL, so bind-mounted
 # files and fresh volumes line up without devcontainer's UID remapping.
