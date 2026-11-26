@@ -36,9 +36,10 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends git openssh-client ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 # Fresh volumes copy this owner and mode, so any UID set by updateRemoteUserUID can write. Dev-only.
-RUN mkdir -p /app/workspace/.venv /home/nonroot/.cache/uv \
- && chown -R nonroot:nonroot /app/workspace /home/nonroot/.cache \
- && chmod 0777 /app/workspace/.venv /home/nonroot/.cache/uv
+# chmod is only required for non-home named volumes. bind-mounted volumes share permissions with host machine. vscode directly changes home subdirectories through updateRemoteUserUID.
+RUN mkdir -p /app/workspace/.venv /home/nonroot/.cache/uv /home/nonroot/data_grid2op \
+ && chown -R nonroot:nonroot /app/workspace /home/nonroot/.cache /home/nonroot/data_grid2op\
+ && chmod 0777 /app/workspace/.venv
 # SYNC_EXTRAS is set at runtime by docker-compose.yml (environment:), so changing extras
 # needs only a recreated container, not a rebuilt image.
 WORKDIR /app/workspace
