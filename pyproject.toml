@@ -69,15 +69,25 @@ conflicts = [[
 
 # Versions RL2Grid was tested with (third_party/RL2Grid/setup.py and conda_env.yml),
 # plus what those old versions need to run. Applies to every extra.
+
+#RL2Grid's pins
+#install_requires=[
+#    # grid2op 1.12.1 fixes some speed up issues
+#    'grid2op==1.11.0',  # 1.11.0 - 1.12.1
+#    'lightsim2grid==0.9',   # 0.9 - 0.10.3
+#    'gymnasium==0.29.1',
+#    ...
+
 constraint-dependencies = [
-    "grid2op==1.11.0",      # RL2Grid's pin
-    "lightsim2grid==0.9.*", # RL2Grid's pin
+    "grid2op==1.12.6",      # 1.12.6 (14 Oct 2026) was not tested by RL2Grid, but it contains an important fix for downloads of prepackaged datasets
+    "lightsim2grid==1.3.1", # current; again not tested by RL2Grid
     "gymnasium==0.29.1",    # RL2Grid's pin; gymnasium 1.x changed vector envs and wrappers
     "torch>=2.2,<2.10",     # RL2Grid's tested range; below are emergent, conservative pins, not from rl2grid
-    "numpy<2",              # Grid2Op 1.11 pulls pandapower 2.14, which uses numpy.Inf (gone in numpy 2)
-    "pandas<3",             # pandas 3 breaks Grid2Op 1.11's power-flow setup (this is  related to pandapower 2.14. Possible check in the future is whether pandapower 3.x would work on grid2op 1.11.0)
-    "setuptools<81",        # Grid2Op 1.11 imports pkg_resources
-]
+    "pandas<3",             # pandas 3 breaks Grid2Op 1.11's power-flow setup (this is  related to pandapower 2.14). Still breaks on Grid2Op 1.12.1 on lightsim2grid.
+    
+] # MISSING (not needed at grid2op=1.12.1):
+# "numpy < 2"            # Grid2Op 1.11 pulls pandapower 2.14, which uses numpy.Inf (gone in numpy 2)
+# "setuptools<81"        # Grid2Op 1.11 imports pkg_resources
 
 # default module-name is  src/<project name, normalized>/
 [tool.uv.build-backend]

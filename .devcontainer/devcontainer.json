@@ -6,7 +6,7 @@
   "updateRemoteUserUID": true,                   // Linux/WSL: remaps nonroot's UID to yours (a no-op when host's is 1000, as built). This is limited in scope - chmod unaffected directories
   // Installs the project (i.e. both dependencies and the proj itself) (editable) and the dev group into the venv volume; add extras here if you use them.
   // Runs on creation and blocks until done (waitFor defaults to updateContentCommand); postCreateCommand would run in the background.
-  "updateContentCommand": "uv sync --locked $SYNC_EXTRAS",
+  "updateContentCommand": "uv sync --locked $SYNC_EXTRAS && python scripts/setup_action_spaces.py",
   "postStartCommand": "uv sync --locked $SYNC_EXTRAS && (bash scripts/check-devcontainer.sh || echo 'environment check failed, see above')",
   "forwardPorts": [8888],                        // optional: Jupyter in a browser
   "customizations": {
